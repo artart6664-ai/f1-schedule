@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>F1 Schedule 2026</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --tg-theme-bg-color: #1e1e1e;
+            --tg-theme-text-color: #ffffff;
+            --tg-theme-hint-color: #aaaaaa;
+            --tg-theme-link-color: #e10600;
+            --tg-theme-button-color: #e10600;
+            --tg-theme-button-text-color: #ffffff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 0;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 15px;
+            background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid #e10600;
+        }
+
+        h1 {
+            font-size: 1.8em;
+            font-weight: bold;
+            background: linear-gradient(45deg, #e10600, #ff4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 0.9em;
+            color: var(--tg-theme-hint-color);
+            letter-spacing: 0.5px;
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0;
+            padding: 0;
+        }
+
+        .race-card {
+            background: linear-gradient(145deg, #2a2a2a, #1f1f1f);
+            padding: 18px 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #333;
+            position: relative;
+            overflow: hidden;
+            -webkit-tap-highlight-color: rgba(225, 6, 0, 0.1);
+        }
+
+        .race-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #e10600, #ff4444);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .race-card:active {
+            background: rgba(225, 6, 0, 0.1);
+        }
+
+        .race-card:active::before {
+            opacity: 1;
+        }
+
+        .race-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .race-number {
+            font-size: 0.75em;
+            color: #888;
+            font-weight: 600;
+            background: rgba(225, 6, 0, 0.15);
+            padding: 3px 8px;
+            border-radius: 10px;
+        }
+
+        .race-date {
+            font-size: 0.85em;
+            color: #e10600;
+            font-weight: 600;
+        }
+
+        .race-country {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 3px;
+            color: #fff;
+        }
+
+        .race-circuit {
+            font-size: 0.9em;
+            color: #aaa;
+        }
+
+        /* Страница детального расписания */
+        .detail-page {
+            display: none;
+            animation: slideIn 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .detail-page.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            background: transparent;
+            color: var(--tg-theme-link-color);
+            padding: 15px;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            border-bottom: 1px solid #333;
+            width: 100%;
+            text-align: left;
+        }
+
+        .back-button:active {
+            background: rgba(225, 6, 0, 0.1);
+        }
+
+        .detail-header {
+            background: linear-gradient(145deg, #2a2a2a, #1f1f1f);
+            padding: 25px 15px;
+            border-bottom: 3px solid #e10600;
+        }
+
+        .detail-country {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .detail-circuit {
+            font-size: 1em;
+            color: #aaa;
+            margin-bottom: 8px;
+        }
+
+        .detail-date {
+            font-size: 1em;
+            color: #e10600;
+            font-weight: 600;
+        }
+
+        .schedule-table {
+            background: var(--tg-theme-bg-color);
+        }
+
+        .schedule-item {
+            display: flex;
+            flex-direction: column;
+            padding: 18px 15px;
+            border-bottom: 1px solid #333;
+            gap: 5px;
+        }
+
+        .schedule-item:last-child {
+            border-bottom: none;
+        }
+
+        .session-name {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .session-date {
+            font-size: 0.9em;
+            color: #aaa;
+        }
+
+        .session-time {
+            font-size: 1.2em;
+            color: #e10600;
+            font-weight: bold;
+        }
+
+        /* Кнопка "Добавить в календарь" */
+        .add-calendar-btn {
+            margin: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, #e10600, #ff4444);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            width: calc(100% - 30px);
+            transition: all 0.2s ease;
+        }
+
+        .add-calendar-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Лоадер */
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: var(--tg-theme-hint-color);
+        }
+
+        .loader.active {
+            display: block;
+        }
+
+        /* Статистика */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 15px;
+            background: #1a1a1a;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 12px;
+            background: #2a2a2a;
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #e10600;
+        }
+
+        .stat-label {
+            font-size: 0.75em;
+            color: #888;
+            margin-top: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Главная страница -->
+        <div id="mainPage">
+            <header>
+                <h1>🏎️ Formula 1</h1>
+                <p class="subtitle">Сезон 2026</p>
+            </header>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number">24</div>
+                    <div class="stat-label">ЭТАПА</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">10</div>
+                    <div class="stat-label">КОМАНД</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">20</div>
+                    <div class="stat-label">ПИЛОТОВ</div>
+                </div>
+            </div>
+
+            <div class="schedule-grid">
+                <div class="race-card" onclick="showDetail('australia')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 1</div>
+                        <div class="race-date">14-16 МАР</div>
+                    </div>
+                    <div class="race-country">🇦🇺 Австралия</div>
+                    <div class="race-circuit">Альберт Парк</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('bahrain')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 2</div>
+                        <div class="race-date">21-23 МАР</div>
+                    </div>
+                    <div class="race-country">🇧🇭 Бахрейн</div>
+                    <div class="race-circuit">Сахир</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('saudi')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 3</div>
+                        <div class="race-date">28-30 МАР</div>
+                    </div>
+                    <div class="race-country">🇸🇦 Саудовская Аравия</div>
+                    <div class="race-circuit">Джидда</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('japan')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 4</div>
+                        <div class="race-date">4-6 АПР</div>
+                    </div>
+                    <div class="race-country">🇯🇵 Япония</div>
+                    <div class="race-circuit">Судзука</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('china')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 5</div>
+                        <div class="race-date">18-20 АПР</div>
+                    </div>
+                    <div class="race-country">🇨🇳 Китай</div>
+                    <div class="race-circuit">Шанхай</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('miami')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 6</div>
+                        <div class="race-date">2-4 МАЙ</div>
+                    </div>
+                    <div class="race-country">🇺🇸 Майами</div>
+                    <div class="race-circuit">Майами</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('imola')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 7</div>
+                        <div class="race-date">16-18 МАЙ</div>
+                    </div>
+                    <div class="race-country">🇮🇹 Имола</div>
+                    <div class="race-circuit">Энцо и Дино Феррари</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('monaco')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 8</div>
+                        <div class="race-date">23-25 МАЙ</div>
+                    </div>
+                    <div class="race-country">🇲🇨 Монако</div>
+                    <div class="race-circuit">Монте-Карло</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('spain')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 9</div>
+                        <div class="race-date">30 МАЙ - 1 ИЮН</div>
+                    </div>
+                    <div class="race-country">🇪🇸 Испания</div>
+                    <div class="race-circuit">Каталунья</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('canada')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 10</div>
+                        <div class="race-date">13-15 ИЮН</div>
+                    </div>
+                    <div class="race-country">🇨🇦 Канада</div>
+                    <div class="race-circuit">Жиль Вильнёв</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('austria')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 11</div>
+                        <div class="race-date">27-29 ИЮН</div>
+                    </div>
+                    <div class="race-country">🇦🇹 Австрия</div>
+                    <div class="race-circuit">Ред Булл Ринг</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('britain')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 12</div>
+                        <div class="race-date">4-6 ИЮЛ</div>
+                    </div>
+                    <div class="race-country">🇬🇧 Великобритания</div>
+                    <div class="race-circuit">Сильверстоун</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('belgium')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 13</div>
+                        <div class="race-date">25-27 ИЮЛ</div>
+                    </div>
+                    <div class="race-country">🇧🇪 Бельгия</div>
+                    <div class="race-circuit">Спа-Франкоршам</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('hungary')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 14</div>
+                        <div class="race-date">1-3 АВГ</div>
+                    </div>
+                    <div class="race-country">🇭🇺 Венгрия</div>
+                    <div class="race-circuit">Хунгароринг</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('netherlands')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 15</div>
+                        <div class="race-date">29-31 АВГ</div>
+                    </div>
+                    <div class="race-country">🇳🇱 Нидерланды</div>
+                    <div class="race-circuit">Зандвоорт</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('italy')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 16</div>
+                        <div class="race-date">5-7 СЕН</div>
+                    </div>
+                    <div class="race-country">🇮🇹 Италия</div>
+                    <div class="race-circuit">Монца</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('azerbaijan')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 17</div>
+                        <div class="race-date">19-21 СЕН</div>
+                    </div>
+                    <div class="race-country">🇦🇿 Азербайджан</div>
+                    <div class="race-circuit">Баку</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('singapore')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 18</div>
+                        <div class="race-date">3-5 ОКТ</div>
+                    </div>
+                    <div class="race-country">🇸🇬 Сингапур</div>
+                    <div class="race-circuit">Марина Бэй</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('usa')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 19</div>
+                        <div class="race-date">17-19 ОКТ</div>
+                    </div>
+                    <div class="race-country">🇺🇸 США</div>
+                    <div class="race-circuit">Остин (COTA)</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('mexico')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 20</div>
+                        <div class="race-date">24-26 ОКТ</div>
+                    </div>
+                    <div class="race-country">🇲🇽 Мексика</div>
+                    <div class="race-circuit">Эрманос Родригес</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('brazil')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 21</div>
+                        <div class="race-date">7-9 НОЯ</div>
+                    </div>
+                    <div class="race-country">🇧🇷 Бразилия</div>
+                    <div class="race-circuit">Интерлагос</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('vegas')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 22</div>
+                        <div class="race-date">21-23 НОЯ</div>
+                    </div>
+                    <div class="race-country">🇺🇸 Лас-Вегас</div>
+                    <div class="race-circuit">Лас-Вегас Стрит</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('qatar')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 23</div>
+                        <div class="race-date">28-30 НОЯ</div>
+                    </div>
+                    <div class="race-country">🇶🇦 Катар</div>
+                    <div class="race-circuit">Лосейл</div>
+                </div>
+
+                <div class="race-card" onclick="showDetail('abudhabi')">
+                    <div class="race-header">
+                        <div class="race-number">ЭТАП 24</div>
+                        <div class="race-date">5-7 ДЕК</div>
+                    </div>
+                    <div class="race-country">🇦🇪 Абу-Даби</div>
+                    <div class="race-circuit">Яс Марина</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Страница детального расписания -->
+        <div id="detailPage" class="detail-page">
+            <button class="back-button" onclick="goBack()">← Назад к календарю</button>
+            
+            <div class="detail-header">
+                <div class="detail-country" id="detailCountry"></div>
+                <div class="detail-circuit" id="detailCircuit"></div>
+                <div class="detail-date" id="detailDate"></div>
+            </div>
+
+            <div class="schedule-table" id="scheduleTable"></div>
+            
+            <button class="add-calendar-btn" onclick="shareRace()">
+                📅 Поделиться расписанием
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Инициализация Telegram Web App
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.enableClosingConfirmation();
+
+        // Применяем тему Telegram
+        document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color || '#1e1e1e');
+        document.documentElement.style.setProperty('--tg-theme-text-color', tg.themeParams.text_color || '#ffffff');
+        document.documentElement.style.setProperty('--tg-theme-hint-color', tg.themeParams.hint_color || '#aaaaaa');
+
+        // Добавляем тактильную обратную связь
+        function haptic() {
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
+            }
+        }
+
+        const raceData = {
+            australia: {
+                country: '🇦🇺 Гран-при Австралии',
+                circuit: 'Трасса: Альберт Парк, Мельбурн',
+                date: '14-16 марта 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 14 марта', time: '12:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 14 марта', time: '16:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 15 марта', time: '13:00' },
+                    { session: 'Квалификация', date: 'Суббота, 15 марта', time: '16:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 16 марта', time: '16:00' }
+                ]
+            },
+            bahrain: {
+                country: '🇧🇭 Гран-при Бахрейна',
+                circuit: 'Трасса: Международная трасса Сахир',
+                date: '21-23 марта 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 21 марта', time: '14:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 21 марта', time: '18:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 22 марта', time: '15:00' },
+                    { session: 'Квалификация', date: 'Суббота, 22 марта', time: '18:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 23 марта', time: '18:00' }
+                ]
+            },
+            saudi: {
+                country: '🇸🇦 Гран-при Саудовской Аравии',
+                circuit: 'Трасса: Корниш Джидды',
+                date: '28-30 марта 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 28 марта', time: '15:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 28 марта', time: '19:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 29 марта', time: '15:30' },
+                    { session: 'Квалификация', date: 'Суббота, 29 марта', time: '19:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 30 марта', time: '20:00' }
+                ]
+            },
+            japan: {
+                country: '🇯🇵 Гран-при Японии',
+                circuit: 'Трасса: Судзука',
+                date: '4-6 апреля 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 4 апреля', time: '11:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 4 апреля', time: '15:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 5 апреля', time: '11:30' },
+                    { session: 'Квалификация', date: 'Суббота, 5 апреля', time: '15:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 6 апреля', time: '14:00' }
+                ]
+            },
+            china: {
+                country: '🇨🇳 Гран-при Китая',
+                circuit: 'Трасса: Шанхайский международный автодром',
+                date: '18-20 апреля 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 18 апреля', time: '11:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 18 апреля', time: '15:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 19 апреля', time: '11:30' },
+                    { session: 'Квалификация', date: 'Суббота, 19 апреля', time: '15:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 20 апреля', time: '15:00' }
+                ]
+            },
+            miami: {
+                country: '🇺🇸 Гран-при Майами',
+                circuit: 'Трасса: Майами Интернешнл Автодром',
+                date: '2-4 мая 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 2 мая', time: '20:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 2 мая', time: '23:30' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 3 мая', time: '19:30' },
+                    { session: 'Квалификация', date: 'Суббота, 3 мая', time: '23:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 4 мая', time: '22:00' }
+                ]
+            },
+            imola: {
+                country: '🇮🇹 Гран-при Имолы',
+                circuit: 'Трасса: Автодром Энцо и Дино Феррари',
+                date: '16-18 мая 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 16 мая', time: '13:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 16 мая', time: '17:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 17 мая', time: '12:30' },
+                    { session: 'Квалификация', date: 'Суббота, 17 мая', time: '16:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 18 мая', time: '15:00' }
+                ]
+            },
+            monaco: {
+                country: '🇲🇨 Гран-при Монако',
+                circuit: 'Трасса: Монте-Карло',
+                date: '23-25 мая 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 23 мая', time: '13:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 23 мая', time: '17:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 24 мая', time: '12:30' },
+                    { session: 'Квалификация', date: 'Суббота, 24 мая', time: '16:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 25 мая', time: '15:00' }
+                ]
+            },
+            spain: {
+                country: '🇪🇸 Гран-при Испании',
+                circuit: 'Трасса: Каталунья (Барселона)',
+                date: '30 мая - 1 июня 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 30 мая', time: '13:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 30 мая', time: '17:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 31 мая', time: '12:30' },
+                    { session: 'Квалификаци��', date: 'Суббота, 31 мая', time: '16:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 1 июня', time: '15:00' }
+                ]
+            },
+            canada: {
+                country: '🇨🇦 Гран-при Канады',
+                circuit: 'Трасса: Жиль Вильнёв (Монреаль)',
+                date: '13-15 июня 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 13 июня', time: '20:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 13 июня', time: '00:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 14 июня', time: '19:30' },
+                    { session: 'Квалификация', date: 'Суббота, 14 июня', time: '23:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 15 июня', time: '21:00' }
+                ]
+            },
+            austria: {
+                country: '🇦🇹 Гран-при Австрии',
+                circuit: 'Трасса: Ред Булл Ринг',
+                date: '27-29 июня 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 27 июня', time: '13:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 27 июня', time: '17:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 28 июня', time: '12:30' },
+                    { session: 'Квалификация', date: 'Суббота, 28 июня', time: '16:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 29 июня', time: '15:00' }
+                ]
+            },
+            britain: {
+                country: '🇬🇧 Гран-при Великобритании',
+                circuit: 'Трасса: Сильверстоун',
+                date: '4-6 июля 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 4 июля', time: '14:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 4 июля', time: '18:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 5 июля', time: '13:30' },
+                    { session: 'Квалификация', date: 'Суббота, 5 июля', time: '17:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 6 июля', time: '16:00' }
+                ]
+            },
+            belgium: {
+                country: '🇧🇪 Гран-при Бельгии',
+                circuit: 'Трасса: Спа-Франкоршам',
+                date: '25-27 июля 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 25 июля', time: '13:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 25 июля', time: '17:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 26 июля', time: '12:30' },
+                    { session: 'Квалификация', date: 'Суббота, 26 июля', time: '16:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 27 июля', time: '15:00' }
+                ]
+            },
+            hungary: {
+                country: '🇭🇺 Гран-при Венгрии',
+                circuit: 'Трасса: Хунгароринг',
+                date: '1-3 августа 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 1 августа', time: '13:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 1 августа', time: '17:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 2 августа', time: '12:30' },
+                    { session: 'Квалификация', date: 'Суббота, 2 августа', time: '16:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 3 августа', time: '15:00' }
+                ]
+            },
+            netherlands: {
+                country: '🇳🇱 Гран-при Нидерландов',
+                circuit: 'Трасса: Зандвоорт',
+                date: '29-31 августа 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 29 августа', time: '12:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 29 августа', time: '16:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 30 августа', time: '11:30' },
+                    { session: 'Квалификация', date: 'Суббота, 30 августа', time: '15:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 31 августа', time: '15:00' }
+                ]
+            },
+            italy: {
+                country: '🇮🇹 Гран-при Италии',
+                circuit: 'Трасса: Автодром Монца',
+                date: '5-7 сентября 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 5 сентября', time: '13:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 5 сентября', time: '17:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 6 сентября', time: '12:30' },
+                    { session: 'Квалификация', date: 'Суббота, 6 сентября', time: '16:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 7 сентября', time: '15:00' }
+                ]
+            },
+            azerbaijan: {
+                country: '🇦🇿 Гран-при Азербайджана',
+                circuit: 'Трасса: Городская трасса Баку',
+                date: '19-21 сентября 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 19 сентября', time: '13:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 19 сентября', time: '17:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 20 сентября', time: '14:30' },
+                    { session: 'Квалификация', date: 'Суббота, 20 сентября', time: '18:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 21 сентября', time: '16:00' }
+                ]
+            },
+            singapore: {
+                country: '🇸🇬 Гран-при Сингапура',
+                circuit: 'Трасса: Марина Бэй',
+                date: '3-5 октября 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 3 октября', time: '14:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 3 октября', time: '18:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 4 октября', time: '14:30' },
+                    { session: 'Квалификация', date: 'Суббота, 4 октября', time: '18:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 5 октября', time: '18:00' }
+                ]
+            },
+            usa: {
+                country: '🇺🇸 Гран-при США',
+                circuit: 'Трасса: COTA (Остин, Техас)',
+                date: '17-19 октября 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 17 октября', time: '21:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 17 октября', time: '01:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 18 октября', time: '20:30' },
+                    { session: 'Квалификация', date: 'Суббота, 18 октября', time: '00:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 19 октября', time: '22:00' }
+                ]
+            },
+            mexico: {
+                country: '🇲🇽 Гран-при Мексики',
+                circuit: 'Трасса: Автодром Эрманос Родригес',
+                date: '24-26 октября 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 24 октября', time: '21:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 24 октября', time: '01:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 25 октября', time: '20:30' },
+                    { session: 'Квалификация', date: 'Суббота, 25 октября', time: '00:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 26 октября', time: '22:00' }
+                ]
+            },
+            brazil: {
+                country: '🇧🇷 Гран-при Бразилии',
+                circuit: 'Трасса: Интерлагос (Сан-Паулу)',
+                date: '7-9 ноября 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 7 ноября', time: '15:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 7 ноября', time: '19:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 8 ноября', time: '15:30' },
+                    { session: 'Квалификация', date: 'Суббота, 8 ноября', time: '19:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 9 ноября', time: '18:00' }
+                ]
+            },
+            vegas: {
+                country: '🇺🇸 Гран-при Лас-Вегаса',
+                circuit: 'Трасса: Лас-Вегас Стрит Серкит',
+                date: '21-23 ноября 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 21 ноября', time: '05:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 21 ноября', time: '09:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 22 ноября', time: '05:30' },
+                    { session: 'Квалификация', date: 'Суббота, 22 ноября', time: '09:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 23 ноября', time: '07:00' }
+                ]
+            },
+            qatar: {
+                country: '🇶🇦 Гран-при Катара',
+                circuit: 'Трасса: Лосейл Интернешнл Серкит',
+                date: '28-30 ноября 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 28 ноября', time: '14:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 28 ноября', time: '18:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 29 ноября', time: '15:30' },
+                    { session: 'Квалификация', date: 'Суббота, 29 ноября', time: '19:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 30 ноября', time: '18:00' }
+                ]
+            },
+            abudhabi: {
+                country: '🇦🇪 Гран-при Абу-Даби',
+                circuit: 'Трасса: Яс Марина',
+                date: '5-7 декабря 2026',
+                schedule: [
+                    { session: 'Свободная практика 1', date: 'Пятница, 5 декабря', time: '13:30' },
+                    { session: 'Свободная практика 2', date: 'Пятница, 5 декабря', time: '17:00' },
+                    { session: 'Свободная практика 3', date: 'Суббота, 6 декабря', time: '14:30' },
+                    { session: 'Квалификация', date: 'Суббота, 6 декабря', time: '18:00' },
+                    { session: 'ГОНКА', date: 'Воскресенье, 7 декабря', time: '17:00' }
+                ]
+            }
+        };
+
+        let currentRace = null;
+
+        function showDetail(raceId) {
+            haptic();
+            currentRace = raceId;
+            const race = raceData[raceId];
+            
+            document.getElementById('detailCountry').textContent = race.country;
+            document.getElementById('detailCircuit').textContent = race.circuit;
+            document.getElementById('detailDate').textContent = race.date;
+            
+            const scheduleTable = document.getElementById('scheduleTable');
+            scheduleTable.innerHTML = '';
+            
+            race.schedule.forEach(item => {
+                const scheduleItem = document.createElement('div');
+                scheduleItem.className = 'schedule-item';
+                scheduleItem.innerHTML = `
+                    <div class="session-name">${item.session}</div>
+                    <div class="session-date">${item.date}</div>
+                    <div class="session-time">${item.time}</div>
+                `;
+                scheduleTable.appendChild(scheduleItem);
+            });
+            
+            document.getElementById('mainPage').style.display = 'none';
+            document.getElementById('detailPage').classList.add('active');
+            
+            window.scrollTo(0, 0);
+
+            // Показываем кнопку "Назад" в Telegram
+            tg.BackButton.show();
+            tg.BackButton.onClick(goBack);
+        }
+
+        function goBack() {
+            haptic();
+            document.getElementById('detailPage').classList.remove('active');
+            document.getElementById('mainPage').style.display = 'block';
+            window.scrollTo(0, 0);
+            tg.BackButton.hide();
+        }
+
+        function shareRace() {
+            haptic();
+            if (currentRace) {
+                const race = raceData[currentRace];
+                let message = `🏎️ ${race.country}\n\n`;
+                message += `${race.circuit}\n`;
+                message += `📅 ${race.date}\n\n`;
+                message += `📋 Расписание:\n`;
+                race.schedule.forEach(item => {
+                    message += `${item.session} - ${item.time}\n`;
+                });
+                
+                // Открываем диалог отправки в Telegram
+                const url = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(message)}`;
+                tg.openTelegramLink(url);
+            }
+        }
+
+        // Обработка жестов свайпа для возврата
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX - touchStartX > 100) { // Свайп вправо
+                if (document.getElementById('detailPage').classList.contains('active')) {
+                    goBack();
+                }
+            }
+        }
+
+        // Уведомляем Telegram что приложение готово
+        tg.ready();
+    </script>
+</body>
+</html>
