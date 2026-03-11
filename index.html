@@ -1026,12 +1026,12 @@
 				message += `📋 Расписание (ваше время ${userTimezone}):\n`;
 				race.schedule.forEach(item => {
 				const localTime = convertTime(item.date, item.time, race.timezone);
-				message += `${item.session} - ${localTime}\n`;
-        });
+					message += `${item.session} - ${localTime}\n`;
+				});
         
-        // Передаём пустую ссылку, а весь контент в текст
-        const url = `https://t.me/share/url?url=%20&text=${encodeURIComponent(message)}`;
-        tg.openTelegramLink(url);
+				// Передаём пустую ссылку, а весь контент в текст
+				const url = `https://t.me/share/url?url=%20&text=${encodeURIComponent(message)}`;
+				tg.openTelegramLink(url);
             }
         }
 
