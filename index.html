@@ -1021,12 +1021,12 @@
     if (currentRace) {
         const race = raceData[currentRace];
         let message = `${race.country}\n\n`;
-        message += `${race.circuit}\n`;
+        message += `🏁${race.circuit}\n`;
         message += `📅 ${race.date}\n\n`;
         message += `📋 Расписание (ваше время ${userTimezone}):\n`;
         race.schedule.forEach(item => {
             const localTime = convertTime(item.date, item.time, race.timezone);
-            message += `${item.session} - ${localTime}\n`;
+            message += `➡️${item.session} - ${item.date} в ${localTime}\n`;
         });
         
         // F-1 2026 как "ссылка" + текст расписания
