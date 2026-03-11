@@ -1029,8 +1029,9 @@
             message += `${item.session} - ${localTime}\n`;
         });
         
-        // Открываем диалог шеринга БЕЗ URL
-        tg.switchInlineQuery(message.trim(ХУЙ), ['users', 'groups', 'channels']);
+        // F-1 2026 как "ссылка" + текст расписания
+        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('F-1 2026')}&text=${encodeURIComponent(message)}`;
+        tg.openTelegramLink(shareUrl);
     }
 }
 
