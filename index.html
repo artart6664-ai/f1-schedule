@@ -1020,7 +1020,7 @@
     haptic();
     if (currentRace) {
         const race = raceData[currentRace];
-        let message = `🏎️ ${race.country}\n\n`;
+        let message = `${race.country}\n\n`;
         message += `${race.circuit}\n`;
         message += `📅 ${race.date}\n\n`;
         message += `📋 Расписание (ваше время ${userTimezone}):\n`;
@@ -1030,7 +1030,7 @@
         });
         
         // F-1 2026 как "ссылка" + текст расписания
-        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('F-1 2026')}&text=${encodeURIComponent(message)}`;
+        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('🏎️F-1 2026🏎️')}&text=${encodeURIComponent(message)}`;
         tg.openTelegramLink(shareUrl);
     }
 }
