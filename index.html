@@ -1028,10 +1028,6 @@
             const localTime = convertTime(item.date, item.time, race.timezone);
             message += `${item.session} - ${localTime}\n`;
         });
-        
-        // Убрали URL, оставили только текст
-        const url = `https://t.me/share/url?text=${encodeURIComponent(message)}`;
-        tg.openTelegramLink(url);
             }
         }
 
