@@ -1017,20 +1017,21 @@
         }
 
         function shareRace() {
-            haptic();
-            if (currentRace) {
-                const race = raceData[currentRace];
-                let message = `🏎️ ${race.country}\n\n`;
-                message += `${race.circuit}\n`;
-                message += `📅 ${race.date}\n\n`;
-                message += `📋 Расписание (ваше время ${userTimezone}):\n`;
-                race.schedule.forEach(item => {
-                    const localTime = convertTime(item.date, item.time, race.timezone);
-                    message += `${item.session} - ${localTime}\n`;
-                });
-                
-                const url = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(message)}`;
-                tg.openTelegramLink(url);
+    haptic();
+    if (currentRace) {
+        const race = raceData[currentRace];
+        let message = `🏎️ ${race.country}\n\n`;
+        message += `${race.circuit}\n`;
+        message += `📅 ${race.date}\n\n`;
+        message += `📋 Расписание (ваше время ${userTimezone}):\n`;
+        race.schedule.forEach(item => {
+            const localTime = convertTime(item.date, item.time, race.timezone);
+            message += `${item.session} - ${localTime}\n`;
+        });
+        
+        // Убрали URL, оставили только текст
+        const url = `https://t.me/share/url?text=${encodeURIComponent(message)}`;
+        tg.openTelegramLink(url);
             }
         }
 
