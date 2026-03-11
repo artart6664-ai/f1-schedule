@@ -1029,9 +1029,8 @@
             message += `${item.session} - ${localTime}\n`;
         });
         
-        // Ставим точку как url - она сольётся с текстом
-        const shareUrl = 'https://t.me/share/url?url=.&text=' + encodeURIComponent(message);
-        tg.openTelegramLink(shareUrl);
+        // Открываем диалог шеринга БЕЗ URL
+        tg.switchInlineQuery(message.trim(), ['users', 'groups', 'channels']);
     }
 }
 
