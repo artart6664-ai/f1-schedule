@@ -75,30 +75,6 @@
             display: inline-block;
         }
 
-        .theme-toggle-container {
-            display: flex;
-            justify-content: flex-end;
-            padding: 10px 15px;
-        }
-
-        .theme-toggle-btn {
-            background: var(--tg-theme-button-color);
-            color: var(--tg-theme-button-text-color);
-            border: none;
-            border-radius: 20px;
-            padding: 8px 15px;
-            font-size: 0.9em;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.2s ease;
-        }
-
-        .theme-toggle-btn:active {
-            transform: scale(0.95);
-        }
-
         .schedule-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -321,16 +297,6 @@
             font-size: 0.75em;
             color: #888;
             margin-top: 3px;
-        }
-
-        /* Подпись автора */
-        .footer {
-            text-align: center;
-            padding: 20px 15px;
-            color: var(--tg-theme-hint-color);
-            font-size: 0.8em;
-            border-top: 1px solid #333;
-            margin-top: 10px;
         }
     </style>
 </head>
@@ -576,13 +542,12 @@
                     <div class="race-circuit">Yas Marina Circuit</div>
                 </div>
             </div>
-
-            <!-- Подпись автора -->
+        </div>
+         <!-- Подпись автора -->
             <div class="footer">
                 Created by DeadBySilence 2026
             </div>
         </div>
-
         <!-- Страница детального расписания -->
         <div id="detailPage" class="detail-page">
             <button class="back-button" onclick="goBack()">← Назад к календарю</button>
@@ -618,32 +583,6 @@
         
         // Отображаем информацию о часовом поясе
         document.getElementById('timezoneInfo').textContent = `⏰ ${userTimezone} (UTC${userTimezoneOffset >= 0 ? '+' : ''}${userTimezoneOffset})`;
-
-        // Переключение темы
-        let isDarkTheme = true;
-
-        document.getElementById('themeToggle').addEventListener('click', function() {
-            const root = document.documentElement;
-            const themeIcon = document.getElementById('themeIcon');
-            
-            if (isDarkTheme) {
-                // Светлая тема
-                root.style.setProperty('--tg-theme-bg-color', '#ffffff');
-                root.style.setProperty('--tg-theme-text-color', '#000000');
-                root.style.setProperty('--tg-theme-hint-color', '#666666');
-                themeIcon.textContent = '☀️';
-                isDarkTheme = false;
-            } else {
-                // Темная тема
-                root.style.setProperty('--tg-theme-bg-color', '#1e1e1e');
-                root.style.setProperty('--tg-theme-text-color', '#ffffff');
-                root.style.setProperty('--tg-theme-hint-color', '#aaaaaa');
-                themeIcon.textContent = '🌙';
-                isDarkTheme = true;
-            }
-            
-            haptic();
-        });
 
         // Функция конвертации времени
         function convertTime(dateStr, timeStr, sourceTimezone) {
@@ -686,25 +625,25 @@
                 'Asia/Bahrain': 3,              // Бахрейн
                 'Asia/Riyadh': 3,               // Саудовская Аравия
                 'Asia/Tokyo': 9,                // Япония
-                'Asia/Shanghai': 8,              // Китай
+                'Asia/Shanghai': 8,             // Китай
                 'America/New_York': -4,         // Майами (EDT)
                 'Europe/Rome': 2,               // Имола (CEST)
-                'Europe/Monaco': 2,              // Монако (CEST)
-                'Europe/Madrid': 2,              // Испания (CEST)
+                'Europe/Monaco': 2,             // Монако (CEST)
+                'Europe/Madrid': 2,             // Испания (CEST)
                 'America/Toronto': -4,          // Канада (EDT)
-                'Europe/Vienna': 2,              // Австрия (CEST)
-                'Europe/London': 1,              // Великобритания (BST)
-                'Europe/Brussels': 2,            // Бельгия (CEST)
-                'Europe/Budapest': 2,            // Венгрия (CEST)
-                'Europe/Amsterdam': 2,           // Нидерланды (CEST)
-                'Asia/Baku': 4,                  // Азербайджан
-                'Asia/Singapore': 8,             // Сингапур
-                'America/Chicago': -5,           // США (CDT)
-                'America/Mexico_City': -5,       // Мексика (CDT)
-                'America/Sao_Paulo': -3,         // Бразилия
-                'America/Los_Angeles': -7,       // Лас-Вегас (PDT)
-                'Asia/Qatar': 3,                  // Катар
-                'Asia/Dubai': 4                    // Абу-Даби
+                'Europe/Vienna': 2,             // Австрия (CEST)
+                'Europe/London': 1,             // Великобритания (BST)
+                'Europe/Brussels': 2,           // Бельгия (CEST)
+                'Europe/Budapest': 2,           // Венгрия (CEST)
+                'Europe/Amsterdam': 2,          // Нидерланды (CEST)
+                'Asia/Baku': 4,                 // Азербайджан
+                'Asia/Singapore': 8,            // Сингапур
+                'America/Chicago': -5,          // США (CDT)
+                'America/Mexico_City': -5,      // Мексика (CDT)
+                'America/Sao_Paulo': -3,        // Бразилия
+                'America/Los_Angeles': -7,      // Лас-Вегас (PDT)
+                'Asia/Qatar': 3,                // Катар
+                'Asia/Dubai': 4                 // Абу-Даби
             };
             return (timezoneOffsets[timezone] || 0) * 60;
         }
@@ -1082,23 +1021,23 @@
         }
 
         function shareRace() {
-            haptic();
-            if (currentRace) {
-                const race = raceData[currentRace];
-                let message = `${race.country}\n\n`;
-                message += `🏁${race.circuit}\n`;
-                message += `📅 ${race.date}\n\n`;
-                message += `📋 Расписание (ваше время ${userTimezone}):\n`;
-                race.schedule.forEach(item => {
-                    const localTime = convertTime(item.date, item.time, race.timezone);
-                    message += `➡️${item.session} - ${item.date} в ${localTime}\n`;
-                });
-                
-                // F-1 2026 как "ссылка" + текст расписания
-                const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('🏎️F-1 2026🏎️')}&text=${encodeURIComponent(message)}`;
-                tg.openTelegramLink(shareUrl);
-            }
-        }
+    haptic();
+    if (currentRace) {
+        const race = raceData[currentRace];
+        let message = `${race.country}\n\n`;
+        message += `🏁${race.circuit}\n`;
+        message += `📅 ${race.date}\n\n`;
+        message += `📋 Расписание (ваше время ${userTimezone}):\n`;
+        race.schedule.forEach(item => {
+            const localTime = convertTime(item.date, item.time, race.timezone);
+            message += `➡️${item.session} - ${item.date} в ${localTime}\n`;
+        });
+        
+        // F-1 2026 как "ссылка" + текст расписания
+        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('🏎️F-1 2026🏎️')}&text=${encodeURIComponent(message)}`;
+        tg.openTelegramLink(shareUrl);
+    }
+}
 
         // Обработка жестов свайпа для возврата
         let touchStartX = 0;
