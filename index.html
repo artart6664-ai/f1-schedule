@@ -271,13 +271,12 @@
             transform: scale(0.98);
         }
 
-        /* Статистика */
+        /* Статистика - кликабельные элементы */
         .stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             padding: 15px;
-            background: #1a1a1a;
         }
 
         .stat-item {
@@ -285,6 +284,15 @@
             padding: 12px;
             background: #2a2a2a;
             border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .stat-item:active {
+            background: rgba(225, 6, 0, 0.2);
+            transform: scale(0.95);
+            border-color: #e10600;
         }
 
         .stat-number {
@@ -298,7 +306,62 @@
             color: #888;
             margin-top: 3px;
         }
-		/* Подпись автора */
+
+        /* Стили для списков команд и пилотов */
+        .list-page {
+            display: none;
+            animation: slideIn 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .list-page.active {
+            display: block;
+        }
+
+        .list-header {
+            background: linear-gradient(145deg, #2a2a2a, #1f1f1f);
+            padding: 20px 15px;
+            border-bottom: 3px solid #e10600;
+            text-align: center;
+        }
+
+        .list-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .list-count {
+            font-size: 1em;
+            color: #e10600;
+            font-weight: 600;
+        }
+
+        .list-container {
+            background: var(--tg-theme-bg-color);
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #333;
+            gap: 15px;
+        }
+
+        .list-number {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #e10600;
+            min-width: 30px;
+        }
+
+        .list-content {
+            font-size: 1.1em;
+            color: #fff;
+        }
+
+        /* Подпись автора */
         .footer {
             text-align: center;
             padding: 20px 15px;
@@ -319,18 +382,19 @@
                 <div class="timezone-info" id="timezoneInfo">⏰ Определение часового пояса...</div>
             </header>
 
+            <!-- Кликабельная статистика -->
             <div class="stats">
-                <div class="stat-item">
-                    <div class="stat-number">24</div>
-                    <div class="stat-label">ЭТАПА</div>
-                </div>
-                <div class="stat-item">
+                <div class="stat-item" onclick="showList('teams')">
                     <div class="stat-number">11</div>
                     <div class="stat-label">КОМАНД</div>
                 </div>
-                <div class="stat-item">
+                <div class="stat-item" onclick="showList('drivers')">
                     <div class="stat-number">22</div>
                     <div class="stat-label">ПИЛОТОВ</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24</div>
+                    <div class="stat-label">ЭТАПА</div>
                 </div>
             </div>
 
@@ -552,11 +616,12 @@
                 </div>
             </div>
         </div>
-         <!-- Подпись автора -->
-            <div class="footer">
-                Created by DeadBySilence 2026
-            </div>
+
+        <!-- Подпись автора -->
+        <div class="footer">
+            Created by DeadBySilence 2026
         </div>
+
         <!-- Страница детального расписания -->
         <div id="detailPage" class="detail-page">
             <button class="back-button" onclick="goBack()">← Назад к календарю</button>
@@ -572,6 +637,34 @@
             <button class="add-calendar-btn" onclick="shareRace()">
                 📅 Поделиться расписанием
             </button>
+        </div>
+
+        <!-- Страница со списком команд -->
+        <div id="teamsPage" class="list-page">
+            <button class="back-button" onclick="goBackFromList()">← Назад к календарю</button>
+            
+            <div class="list-header">
+                <div class="list-title">🏎️ КОМАНДЫ F1 2026</div>
+                <div class="list-count">11 КОМАНД</div>
+            </div>
+
+            <div class="list-container" id="teamsList">
+                <!-- Сюда будет вставлен список команд -->
+            </div>
+        </div>
+
+        <!-- Страница со списком пилотов -->
+        <div id="driversPage" class="list-page">
+            <button class="back-button" onclick="goBackFromList()">← Назад к календарю</button>
+            
+            <div class="list-header">
+                <div class="list-title">🏎️ ПИЛОТЫ F1 2026</div>
+                <div class="list-count">22 ПИЛОТА</div>
+            </div>
+
+            <div class="list-container" id="driversList">
+                <!-- Сюда будет вставлен список пилотов -->
+            </div>
         </div>
     </div>
 
@@ -640,19 +733,19 @@
                 'Europe/Monaco': 2,             // Монако (CEST)
                 'Europe/Madrid': 2,             // Испания (CEST)
                 'America/Toronto': -4,          // Канада (EDT)
-                'Europe/Vienna': 2,             // Австрия (CEST)
-                'Europe/London': 1,             // Великобритания (BST)
-                'Europe/Brussels': 2,           // Бельгия (CEST)
-                'Europe/Budapest': 2,           // Венгрия (CEST)
-                'Europe/Amsterdam': 2,          // Нидерланды (CEST)
-                'Asia/Baku': 4,                 // Азербайджан
-                'Asia/Singapore': 8,            // Сингапур
-                'America/Chicago': -5,          // США (CDT)
-                'America/Mexico_City': -5,      // Мексика (CDT)
-                'America/Sao_Paulo': -3,        // Бразилия
-                'America/Los_Angeles': -7,      // Лас-Вегас (PDT)
-                'Asia/Qatar': 3,                // Катар
-                'Asia/Dubai': 4                 // Абу-Даби
+                'Europe/Vienna': 2,              // Австрия (CEST)
+                'Europe/London': 1,              // Великобритания (BST)
+                'Europe/Brussels': 2,            // Бельгия (CEST)
+                'Europe/Budapest': 2,            // Венгрия (CEST)
+                'Europe/Amsterdam': 2,           // Нидерланды (CEST)
+                'Asia/Baku': 4,                  // Азербайджан
+                'Asia/Singapore': 8,             // Сингапур
+                'America/Chicago': -5,           // США (CDT)
+                'America/Mexico_City': -5,       // Мексика (CDT)
+                'America/Sao_Paulo': -3,         // Бразилия
+                'America/Los_Angeles': -7,       // Лас-Вегас (PDT)
+                'Asia/Qatar': 3,                  // Катар
+                'Asia/Dubai': 4                    // Абу-Даби
             };
             return (timezoneOffsets[timezone] || 0) * 60;
         }
@@ -765,13 +858,13 @@
                 schedule: [
                     { session: 'Свободная практика 1', date: '5 июня 2026', time: '12:30' },
                     { session: 'Свободная практика 2', date: '5 июня 2026', time: '16:00' },
-                    { session: 'Свободная практика 3', date: '6 нюня 2026', time: '11:30' },
+                    { session: 'Свободная практика 3', date: '6 июня 2026', time: '11:30' },
                     { session: 'Квалификация', date: '6 июня 2026', time: '15:00' },
                     { session: 'ГОНКА', date: '7 июня 2026', time: '14:00' }
                 ]
             },
             spain: {
-                ccountry: '🇪🇸 Гран-при Испании',
+                country: '🇪🇸 Гран-при Испании',
                 circuit: 'Трасса: Каталунья (Барселона)',
                 date: '12-14 июня 2026',
                 timezone: 'Europe/Madrid',
@@ -980,6 +1073,114 @@
             }
         };
 
+        // Данные для списков команд и пилотов
+        const teamsData = [
+            "Oracle Red Bull Racing",
+            "Scuderia Ferrari HP",
+            "Visa Cash App Racing Bulls Formula One Team",
+            "McLaren Mastercard F1 Team",
+            "Mercedes-AMG PETRONAS Formula One Team",
+            "Atlassian Williams Racing",
+            "Aston Martin Aramco Formula One Team",
+            "TGR Haas F1 Team",
+            "Audi Revolut F1 Team",
+            "BWT Alpine Formula 1 Team",
+            "Cadillac Formula 1 Team"
+        ];
+
+        const driversData = [
+            "Макс Ферстаппен[3]",
+            "Айзек Хаджар[6]",
+            "Шарль Леклер[16]",
+            "Льюис Хэмилтон[44]",
+            "Арвид Линдблад[41]",
+            "Лиам Лоусон[30]",
+            "Оскар Пиастри[81]",
+            "Ландо Норрис[1]",
+            "Джордж Расселл[63]",
+            "Андреа Кими Антонелли[12]",
+            "Алекс Элбон[23]",
+            "Карлос Сайнс[55]",
+            "Лэнс Стролл[18]",
+            "Фернандо Алонсо[14]",
+            "Эстебан Окон[31]",
+            "Оливер Берман[87]",
+            "Нико Хюлкенберг[27]",
+            "Габриэль Бортолето[5]",
+            "Пьер Гасли[10]",
+            "Франко Колапинто[43]",
+            "Серхио Перес[11]",
+            "Валттери Боттас[77]"
+        ];
+
+        let currentList = null;
+
+        // Функция для отображения списков
+        function showList(listType) {
+            haptic();
+            currentList = listType;
+            
+            // Скрываем главную страницу
+            document.getElementById('mainPage').style.display = 'none';
+            
+            // Показываем нужную страницу списка
+            if (listType === 'teams') {
+                document.getElementById('teamsPage').classList.add('active');
+                renderTeamsList();
+            } else if (listType === 'drivers') {
+                document.getElementById('driversPage').classList.add('active');
+                renderDriversList();
+            }
+            
+            window.scrollTo(0, 0);
+            
+            // Показываем кнопку "Назад" в Telegram
+            tg.BackButton.show();
+            tg.BackButton.onClick(goBackFromList);
+        }
+
+        // Функция для отрисовки списка команд
+        function renderTeamsList() {
+            const container = document.getElementById('teamsList');
+            container.innerHTML = '';
+            
+            teamsData.forEach((team, index) => {
+                const item = document.createElement('div');
+                item.className = 'list-item';
+                item.innerHTML = `
+                    <div class="list-number">${index + 1}</div>
+                    <div class="list-content">${team}</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Функция для отрисовки списка пилотов
+        function renderDriversList() {
+            const container = document.getElementById('driversList');
+            container.innerHTML = '';
+            
+            driversData.forEach((driver, index) => {
+                const item = document.createElement('div');
+                item.className = 'list-item';
+                item.innerHTML = `
+                    <div class="list-number">${index + 1}</div>
+                    <div class="list-content">${driver}</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Функция возврата из списка
+        function goBackFromList() {
+            haptic();
+            document.getElementById('teamsPage').classList.remove('active');
+            document.getElementById('driversPage').classList.remove('active');
+            document.getElementById('mainPage').style.display = 'block';
+            window.scrollTo(0, 0);
+            tg.BackButton.hide();
+        }
+
         let currentRace = null;
 
         function showDetail(raceId) {
@@ -1030,23 +1231,23 @@
         }
 
         function shareRace() {
-    haptic();
-    if (currentRace) {
-        const race = raceData[currentRace];
-        let message = `${race.country}\n\n`;
-        message += `🏁${race.circuit}\n`;
-        message += `📅 ${race.date}\n\n`;
-        message += `📋 Расписание (ваше время ${userTimezone}):\n`;
-        race.schedule.forEach(item => {
-            const localTime = convertTime(item.date, item.time, race.timezone);
-            message += `➡️${item.session} - ${item.date} в ${localTime}\n`;
-        });
-        
-        // F-1 2026 как "ссылка" + текст расписания
-        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('🏎️F-1 2026🏎️')}&text=${encodeURIComponent(message)}`;
-        tg.openTelegramLink(shareUrl);
-    }
-}
+            haptic();
+            if (currentRace) {
+                const race = raceData[currentRace];
+                let message = `${race.country}\n\n`;
+                message += `🏁${race.circuit}\n`;
+                message += `📅 ${race.date}\n\n`;
+                message += `📋 Расписание (ваше время ${userTimezone}):\n`;
+                race.schedule.forEach(item => {
+                    const localTime = convertTime(item.date, item.time, race.timezone);
+                    message += `➡️${item.session} - ${item.date} в ${localTime}\n`;
+                });
+                
+                // F-1 2026 как "ссылка" + текст расписания
+                const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('🏎️F-1 2026🏎️')}&text=${encodeURIComponent(message)}`;
+                tg.openTelegramLink(shareUrl);
+            }
+        }
 
         // Обработка жестов свайпа для возврата
         let touchStartX = 0;
@@ -1065,6 +1266,9 @@
             if (touchEndX - touchStartX > 100) {
                 if (document.getElementById('detailPage').classList.contains('active')) {
                     goBack();
+                } else if (document.getElementById('teamsPage').classList.contains('active') || 
+                          document.getElementById('driversPage').classList.contains('active')) {
+                    goBackFromList();
                 }
             }
         }
